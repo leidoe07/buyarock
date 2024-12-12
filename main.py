@@ -9,7 +9,7 @@ conf = Dynaconf(
     settings_file = ['settings.toml']
 )
 
-def  connect_dv():
+def connect_db ():
     conn =pymysql.connect(
         host="10.100.34.80",
         database="ldore_buy_a_rock",
@@ -29,7 +29,7 @@ def index():
 @app.route("/browse")
 def  product_browse ():
     query = request.args.get('query')
-    conn = connect_dv()
+    conn = connect_db()
 
     cursor = conn.cursor()
 
@@ -45,3 +45,20 @@ def  product_browse ():
     conn.close
     
     return render_template("browse.html.jinja", product = results)
+
+@app.route("/product/<product_id>")
+def product_page(product_id):
+    conn = connect_db()
+
+    cursor = conn.cursor()
+
+    cursor.execute(f"SELECT * FROM `Product` WHERE `id` = {product_id};")
+
+    result =cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    return render_template("product.html.jinja" , product = result)
+
+    
