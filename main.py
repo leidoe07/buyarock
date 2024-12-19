@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request,redirect,flash
+from flask import Flask, render_template, request,redirect,flash,abort
 import pymysql
 from dynaconf import Dynaconf
-
+import flask_login
 
 
 app = Flask(__name__)
@@ -12,6 +12,41 @@ conf = Dynaconf(
 
 
 app.secret_key = conf.secret_key
+
+
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
+login_manager.login_view =('/signin')
+
+class User:
+    is_authenticated = True
+    is_anonymous = False
+    is_active = True
+    
+    def __init__(self, user_id, username,email,first_name,last_name):
+        self.user_id = user_id
+        self.username = username
+        self.email = email
+        self.first_name = first_name
+        self.last_name = last_name
+
+    def get_id(self) :
+        return str(self.user_id)   
+    
+
+
+@login_manager.user_loader    
+def load_user(user_id):
+    conn = connect_db()
+    cursor =conn.cursor()
+    cursor.execute(f"SELECT * FROM `Customer` WHERE `id` = {user_id};")
+    result = cursor.fetchone()
+    cursor.close
+    conn.close
+
+    if result is not None:
+        return User(result['id'], result['username'], result['email'],result['first_name'],result['last_name'])
+
 def connect_db ():
     conn =pymysql.connect(
         host="10.100.34.80",
@@ -23,6 +58,9 @@ def connect_db ():
 
     )
     return conn
+
+
+
 
 @app.route("/")
 def index():
@@ -61,13 +99,18 @@ def product_page(product_id):
 
     cursor.close()
     conn.close()
+    if result is  None:
+        abort(404)
+    return render_template("product.html.jinja")
 
-    return render_template("product.html.jinja" , product = result)
+
+
 
     
 @app.route("/signup", methods=["POST", "GET"])
 def sign_up():
-
+    if flask_login.current_user.is_authenticated:
+        return redirect('/')
     if request.method == "POST":
         
         first_name=request.form["first_name"]
@@ -84,11 +127,13 @@ def sign_up():
         conn = connect_db()
         cursor = conn.cursor()
 
+
+
         if password!= confirm_password:
             flash(" passwords do not match")
 
-        SpecialSym =['$', '@', '#', '%']
-        if not any(char in SpecialSym for char in password):
+        spec_char=['$', '@', '#', '%']
+        if not any(char in spec_char for char in password):
             print('Password should have at least one of the symbols $@#') 
 
         if len(password) < 8:
@@ -128,6 +173,43 @@ def sign_up():
 
 
 
-@app.route("/signin")
+@app.route("/signin", methods=["POST", "GET"])
 def sign_in():
-     return  render_template("signin.html.jinja")
+    if request.method =="POST" :
+        username = request.form['username']
+        password = request.form['password']
+
+        conn =connect_db()
+
+        cursor = conn.cursor()
+        
+        cursor.execute(f"SELECT * FROM `Customer` WHERE `username` = '{username}';")
+
+        result = cursor.fetchone()
+        
+        if result is None:
+            flash('Username/Password is Wrong')
+        elif password != result['password']:
+            flash('Username/Password is Wrong')
+        else:
+            user = User(result['id'], result['username'], result['email'],result['first_name'],result['last_name'])
+
+            flask_login.login_user(user)
+            flask_login.current_user.is_authenticated
+            return redirect('/')
+
+    if flask_login.current_user.is_authenticated:
+        return redirect('/')
+    return  render_template("signin.html.jinja")
+
+@app.route('/logout')
+def logout():
+        flask_login.logout_user()
+        return redirect('/')
+
+
+@app.route('/cart')
+@flask_login.login_required
+def cart():
+   return "hi"
+    
