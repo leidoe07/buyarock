@@ -87,6 +87,8 @@ def  product_browse ():
     
     return render_template("browse.html.jinja", product = results)
 
+
+
 @app.route("/product/<product_id>")
 def product_page(product_id):
     conn = connect_db()
@@ -101,10 +103,29 @@ def product_page(product_id):
     conn.close()
     if result is  None:
         abort(404)
-    return render_template("product.html.jinja")
+    return render_template("product.html.jinja", product = result)
 
 
+@app.route("/product/<product_id>/cart" ,methods =['POST'])
+@flask_login.login_required
+def add_to_cart(product_id):
+    if request.method == "POST":
+        quantity =request.form["quantity"]
 
+        conn = connect_db()
+        cursor = conn.cursor()
+
+        cursor.execute(f"""
+                        INSERT INTO `Cart`
+                        (`quantity`, `customer_id`, `product_id`)
+                        VALUES
+                        ('{quantity}','{flask_login.current_user.user_id}','{product_id}')
+
+                   
+                  ;""" )
+        
+
+        return redirect('/cart')
 
     
 @app.route("/signup", methods=["POST", "GET"])
@@ -168,11 +189,6 @@ def sign_up():
 
     return  render_template("signup.html.jinja")            
 
-
-
-
-
-
 @app.route("/signin", methods=["POST", "GET"])
 def sign_in():
     if request.method =="POST" :
@@ -206,7 +222,6 @@ def sign_in():
 def logout():
         flask_login.logout_user()
         return redirect('/')
-
 
 @app.route('/cart')
 @flask_login.login_required

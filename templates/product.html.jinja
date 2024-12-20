@@ -12,7 +12,7 @@
 <body class ="container">
  
   {% include "components/navbar.html.jinja" %}
-<div></div>
+
  
    
 <h3> {{product['product_name']}}</h3>
@@ -42,14 +42,31 @@
   </button>
 
 
+
+
+
   <p class="col-4">
   <div class="card" style="width: 18rem;">
   <div class="card-body">
     <h5 class="card-title"></h5>
     <h6 class="card-subtitle mb-2 text-body-secondary"></h6>
     <p class="card-text"></p>
-    <a href="#" class="card-link">Card link</a>
-    <a href="#" class="card-link">Another link</a>
+
+
+
+  <form method="post" action="/product/<product_id>/cart" >
+  <div>
+  <label for="qty " class ="btn btn-primary "> Qty </label>
+  <input type="number" id ="qty" name = quantity>
+
+  </div>
+
+
+  <button type ="submit"> Add to cart</button>
+
+</form>
+
+    
   </div>
 </div>
   
