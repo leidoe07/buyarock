@@ -83,7 +83,7 @@ def  product_browse ():
     results = cursor.fetchall()
 
     cursor.close()
-    conn.close
+    conn.close()
     
     return render_template("browse.html.jinja", product = results)
 
@@ -181,7 +181,7 @@ def sign_up():
         else:
             return redirect('/signin')
         finally:
-            cursor.close
+            cursor.close()
             conn.close()
 
        
@@ -266,4 +266,4 @@ def delete_from_cart():
     conn.close()
     cursor.close()
     return redirect('/cart')
-        
+       
