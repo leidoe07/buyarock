@@ -245,7 +245,7 @@ def cart():
    results = cursor.fetchall()
    total=0 
    for item in results:
-    total+=(int(item['price'])*int(item['quantity']))
+    total+=(item['price']*item['quantity'])
     return render_template("cart.html.jinja", products=results, total=total)
 
 
