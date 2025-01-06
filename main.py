@@ -256,14 +256,25 @@ def cart():
    return render_template('cart.html.jinja', products=results)
     
 
-@app.route("/cart/delete" ,methods =['POST'])
+@app.route("/cart/<cart_id>/delete" ,methods =['POST'])
 @flask_login.login_required
-def delete_from_cart():
-    customer_id = flask_login.current_user.user_id
+def delete_from_cart(cart_id):
+   
+    
     conn = connect_db()
     cursor = conn.cursor()
-    cursor.execute(f"""DELETE FROM `Cart` WHERE  `customer_id` = {customer_id} ;""" )
+    cursor.execute(f"""DELETE FROM `Cart` WHERE  `id` = {cart_id} ;""" )
     conn.close()
     cursor.close()
     return redirect('/cart')
        
+@app.route("/cart/<cart_id>/update")
+@flask_login.login_required
+def update_cart(cart_id):
+    cart_itm_qty = request.form["quantity"]
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute(f""" UPDATE `Cart` SET `quantity`= {cart_itm_qty} WHERE  `id` = {cart_id} ;""" )
+    conn.close()
+    cursor.close()
+    return redirect('/cart')
