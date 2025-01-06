@@ -268,7 +268,7 @@ def delete_from_cart(cart_id):
     cursor.close()
     return redirect('/cart')
        
-@app.route("/cart/<cart_id>/update")
+@app.route("/cart/<cart_id>/update",methods =['POST'])
 @flask_login.login_required
 def update_cart(cart_id):
     cart_itm_qty = request.form["quantity"]

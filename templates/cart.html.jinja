@@ -29,9 +29,9 @@
       
       <td>  <div class="mb-3">
     <form  id = "updateform-{{item['id']}}" action="/cart/{{item['id']}}/update" method="post">
-    <input type="number" class="form-control" d value="{{item['quantity']}}" min="1" name="quantity" >
+    <input type="number" class="form-control" value="{{item['quantity']}}" min="1" name="quantity" >
     </form>
-    <div  class="form-text"> </div>
+    
     
   </div> 
 <button type="button" class="btn btn-primary" form ="updateform-{{item['id']}}">Submit</button>
