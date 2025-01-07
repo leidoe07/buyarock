@@ -120,7 +120,8 @@ def add_to_cart(product_id):
                         (`quantity`, `customer_id`, `product_id`)
                         VALUES
                         ('{quantity}','{flask_login.current_user.user_id}','{product_id}')
-
+                        ON DUPLICATE KEY UPDATE
+                            `quantity`= `quantity` + {quantity}
                    
                   ;""" )
         
@@ -243,18 +244,19 @@ def cart():
                 WHERE `customer_id` =  {customer_id};""")
 
    results = cursor.fetchall()
-   total=0 
+   cart_total=0 
+   cart_total = 0  # Initialize the cart total
    for item in results:
-    total+=(item['price']*item['quantity'])
-    return render_template("cart.html.jinja", products=results, total=total)
+    cart_total += (item['price'] * item['quantity'])
 
 
-   cursor.close()
+    cursor.close()
 
-   conn.close()
+    conn.close()    
 
-   return render_template('cart.html.jinja', products=results)
-    
+    return render_template("cart.html.jinja", products=results, cart_total=cart_total)
+
+
 
 @app.route("/cart/<cart_id>/delete" ,methods =['POST'])
 @flask_login.login_required
