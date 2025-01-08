@@ -280,3 +280,26 @@ def update_cart(cart_id):
     conn.close()
     cursor.close()
     return redirect('/cart')
+
+@app.route("/checkout")
+@flask_login.login_required
+def checkout_page():
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    customer_id = flask_login.current_user.user_id
+    cursor.execute(f"""
+                SELECT 
+                    `product_name`,
+                    `price`,
+                    `Cart`.`quantity`,
+                    `image`,
+                    `product_id`,
+                    `Cart`.`id`
+                FROM `Cart` 
+                JOIN `Product` ON `product_id` = `Product`.`id` 
+                WHERE `customer_id` =  {customer_id};""")
+    
+    conn.close()
+    cursor.close()
+    return render_template("checkout.html.jinja")
