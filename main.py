@@ -303,3 +303,41 @@ def checkout_page():
     conn.close()
     cursor.close()
     return render_template("checkout.html.jinja")
+
+
+
+@app.route("/continue_sale")
+def finish_sale(cart_id):
+    conn = connect_db()
+    cursor = conn.cursor()
+    customer_id = flask_login.current_user.user_id
+    cursor.execute(f"""
+                   
+                    INSERT INTO `Sale`
+                   (`customer_id`,)
+                   VALUES
+                    {customer_id}
+"""
+)
+    
+    cursor.execute(f""" SELECT * `Cart` WHERE  `id` = {cart_id}
+""")
+    results = cursor.fetchall()
+
+
+    for item in results:
+        
+        cursor.execute (f"""
+                   
+                    INSERT INTO `Sale_Product`
+                   `product_id`
+                   VALUES
+                        (`Cart`.`product_id`)
+""")
+        sale_id=cursor.lastrowid
+    #cursor.execute(f"""
+
+    #"DELETE FROM `Cart` WHERE  `id` = {customer_id}
+
+    #""")
+    return ("thankyou")

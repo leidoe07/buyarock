@@ -23,7 +23,7 @@
         <div class="carousel-inner">
           {% for image in product['images'] %}
           <div class="carousel-item {% if loop.first %}active{% endif %}">
-            <img src="{{ image }}" class="d-block w-100" alt="{{ product['product_name'] }}">
+            <img src="{{ product[image] }}" class="d-block w-100" alt="{{ product['product_name'] }}">
           </div>
           {% endfor %}
         </div>
