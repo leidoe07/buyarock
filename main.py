@@ -224,14 +224,14 @@ def logout():
         flask_login.logout_user()
         return redirect('/')
 
-@app.route('/cart')
+@app.route('/cart', methods=["POST", "GET"] )
 @flask_login.login_required
 def cart():
-   conn=connect_db()
-   cursor= conn.cursor()
+    conn=connect_db()
+    cursor= conn.cursor()
 
-   customer_id = flask_login.current_user.user_id
-   cursor.execute(f"""
+    customer_id = flask_login.current_user.user_id
+    cursor.execute(f"""
                 SELECT 
                     `product_name`,
                     `price`,
@@ -243,11 +243,13 @@ def cart():
                 JOIN `Product` ON `product_id` = `Product`.`id` 
                 WHERE `customer_id` =  {customer_id};""")
 
-   results = cursor.fetchall()
-   cart_total=0 
-   cart_total = 0  # Initialize the cart total
-   for item in results:
-    cart_total += (item['price'] * item['quantity'])
+    results = cursor.fetchall()
+
+    cart_total = 0 
+
+    for item in results:
+        total = item['price'] * item['quantity']
+        cart_total += total
 
 
     cursor.close()
@@ -258,7 +260,7 @@ def cart():
 
 
 
-@app.route("/cart/<cart_id>/delete" ,methods =['POST'])
+@app.route("/cart/<cart_id>/delete" ,methods =['POST','GET'])
 @flask_login.login_required
 def delete_from_cart(cart_id):
    
@@ -281,7 +283,7 @@ def update_cart(cart_id):
     cursor.close()
     return redirect('/cart')
 
-@app.route("/checkout")
+@app.route("/checkout",methods =['POST'])
 @flask_login.login_required
 def checkout_page():
     conn = connect_db()
@@ -299,45 +301,53 @@ def checkout_page():
                 FROM `Cart` 
                 JOIN `Product` ON `product_id` = `Product`.`id` 
                 WHERE `customer_id` =  {customer_id};""")
-    
+    results = cursor.fetchall()
+    for item in results:
+        total = item['price'] * item['quantity']
+        cart_total += total
+
     conn.close()
     cursor.close()
-    return render_template("checkout.html.jinja")
+    return render_template("checkout.html.jinja"  , products=results, cart_total=cart_total )
 
 
 
-@app.route("/continue_sale")
-def finish_sale(cart_id):
+@app.route ("/continue_sale", methods=["POST"]) 
+
+def finish_sale():
     conn = connect_db()
     cursor = conn.cursor()
     customer_id = flask_login.current_user.user_id
-    cursor.execute(f"""
-                   
-                    INSERT INTO `Sale`
-                   (`customer_id`,)
-                   VALUES
-                    {customer_id}
-"""
-)
-    
-    cursor.execute(f""" SELECT * `Cart` WHERE  `id` = {cart_id}
-""")
-    results = cursor.fetchall()
 
+
+    cursor.execute(f"""INSERT INTO `Sale` (`customer_id`)
+                    VALUES ({customer_id});""")
+
+
+
+    sale_id = cursor.lastrowid
+
+
+
+    cursor.execute(f""" SELECT * FROM `Cart`  WHERE  `customer_id` = {customer_id}   ;""")
+    results = cursor.fetchall()
+    
 
     for item in results:
         
         cursor.execute (f"""
                    
                     INSERT INTO `Sale_Product`
-                   `product_id`
+                   (`product_id`, `sale_id`,`quantity`)
                    VALUES
-                        (`Cart`.`product_id`)
-""")
-        sale_id=cursor.lastrowid
+                        ({item['product_id']}, {sale_id },{item['quantity']} )
+;""")
+        
+
+
     #cursor.execute(f"""
 
     #"DELETE FROM `Cart` WHERE  `id` = {customer_id}
 
     #""")
-    return ("thankyou")
+    return ("/thankyou")

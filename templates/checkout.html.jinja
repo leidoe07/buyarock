@@ -111,21 +111,17 @@
                             </tr>
                         </thead>
                         <tbody>
+                        {%for item in products%}
                             <tr>
-                                <td>Rock 1</td>
-                                <td>2</td>
-                                <td>$5.00</td>
-                                <td>$10.00</td>
+                                <td>{{item['product_name']}}</td>
+                                <td>{{item['quantity']}}</td>
+                                <td>{{item['price']}}</td>
+                                <td>{{item['price']* item['quantity']}}</td>
                             </tr>
-                            <tr>
-                                <td>Rock 2</td>
-                                <td>1</td>
-                                <td>$8.00</td>
-                                <td>$8.00</td>
-                            </tr>
+                         {%endfor%}   
                             <tr>
                                 <td colspan="3" class="text-end fw-bold">Grand Total:</td>
-                                <td>$18.00</td>
+                                <td>{{'%.2f'|format(cart_total)}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -135,7 +131,9 @@
 
         <!-- Checkout Button -->
         <section class="text-center">
-            <button type="button" class="btn btn-info btn-lg">Proceed to Checkout</button>
+        <form action="/continue_sale" method="post">
+            <button type="submit" class="btn btn-info btn-lg">Proceed to Checkout</button>
+        </form>    
         </section>
     </main>
 

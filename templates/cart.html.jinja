@@ -75,21 +75,24 @@
  {%endfor%}
 
 {%endif%}
-{%for item in products%}
     <tr>
     <td>
     </td>
     <td>
-  
       Cart Total:
       
       <strong> {{'%.2f'|format(cart_total)}}</strong>
       </td>
       </tr>
       </tfoot>
-{%endfor%}
+
 
  </table>
+ <section class="text-center">
+        <form action="/checkout" method="post">
+            <button type="submit" class="btn btn-info btn-lg">Proceed to Checkout</button>
+        </form>    
+        </section>
  
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   
