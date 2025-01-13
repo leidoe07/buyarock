@@ -95,15 +95,21 @@ def product_page(product_id):
 
     cursor = conn.cursor()
 
-    cursor.execute(f"SELECT * FROM `Product` WHERE `id` = {product_id};")
+    cursor.execute(f"""SELECT * FROM `Product` WHERE `id` = {product_id};""")
 
     result =cursor.fetchone()
+
+    cursor.execute(f""" SELECT `customer_id`,`product_id`,`rating`,`Review`.`timestamp`, `comment` ,`Review`.`id`	
+                FROM `Review`  
+                JOIN  `Customer` ON `customer_id` = `Customer`.`id`
+                WHERE  `product_id` = {product_id} ;""")
+    results = cursor.fetchall()
 
     cursor.close()
     conn.close()
     if result is  None:
         abort(404)
-    return render_template("product.html.jinja", product = result)
+    return render_template("product.html.jinja", product = result , reviews = results)
 
 
 @app.route("/product/<product_id>/cart" ,methods =['POST'])
@@ -125,7 +131,9 @@ def add_to_cart(product_id):
                    
                   ;""" )
         
-
+        
+        cursor.close()
+        conn.close()
         return redirect('/cart')
 
     
@@ -242,6 +250,7 @@ def cart():
                 FROM `Cart` 
                 JOIN `Product` ON `product_id` = `Product`.`id` 
                 WHERE `customer_id` =  {customer_id};""")
+    
 
     results = cursor.fetchall()
 
@@ -302,6 +311,7 @@ def checkout_page():
                 JOIN `Product` ON `product_id` = `Product`.`id` 
                 WHERE `customer_id` =  {customer_id};""")
     results = cursor.fetchall()
+    cart_total = 0
     for item in results:
         total = item['price'] * item['quantity']
         cart_total += total
@@ -313,7 +323,6 @@ def checkout_page():
 
 
 @app.route ("/continue_sale", methods=["POST"]) 
-
 def finish_sale():
     conn = connect_db()
     cursor = conn.cursor()
@@ -345,9 +354,27 @@ def finish_sale():
         
 
 
-    #cursor.execute(f"""
+    cursor.execute(f"""
 
-    #"DELETE FROM `Cart` WHERE  `id` = {customer_id}
+    "DELETE FROM `Cart` WHERE  `id` = {customer_id}
 
-    #""")
+    """)
     return ("/thankyou")
+
+@app.route("/add_review", methods=["POST"])
+def add_review(product_id):
+    conn = connect_db()
+    cursor = conn.cursor()
+    comment = request.form["comment"]
+    rating = request.form["rating"]
+    customer_id = flask_login.current_user.user_id
+
+    
+    cursor.execute(f"""
+                    INSERT INTO `Review`
+                    (`product_id`, `comment`, `rating`, `customer_id`)
+                    VALUES
+                    ('{product_id}', '{comment}', '{rating}','{customer_id}')
+                    """)
+    flash("Review Added")
+    return redirect("/product/<product_id>")
