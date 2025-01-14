@@ -50,7 +50,7 @@
 <div class="container">
 
   <h3>Reviews</h3>
-  <form action="/add_review/{{ 'id' }}" method="post">
+  <form action="/add_review/{{ product['id'] }}" method="post">
   <input type="number" id="rating" name="rating" class="form-control" min="1" max="5"   placeholder="Please input rating">
   <div class="form-floating">
   <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px" name="comment"></textarea>
