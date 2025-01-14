@@ -367,7 +367,7 @@ def finish_sale():
     """)
     return ("/thankyou")
 
-@app.route("/add_review/<product_id>", methods=["POST"])
+@app.route("/add_review/<product_id>/", methods=["POST"])
 def add_review(product_id):
     conn = connect_db()
     cursor = conn.cursor()
@@ -375,17 +375,16 @@ def add_review(product_id):
     rating = request.form["rating"]
     customer_id = flask_login.current_user.user_id
     cursor.execute(f"SELECT * FROM `Review` WHERE `product_id` = {product_id} AND `customer_id` = {customer_id};")
-    
+    result = cursor.fetchone()
     cursor.execute(f"""
                     INSERT INTO `Review`
                     (`product_id`, `comment`, `rating`, `customer_id`)
                     VALUES
                     ('{product_id}', '{comment}', '{rating}','{customer_id}')
-                    """)
+                    ;""")
     
     conn.close()
     cursor.close()
     flash("Review Added")
-    return redirect("/product/<product_id>", product_id=product_id)
+    return redirect("/product/<product_id>", product_id=product_id, result=result)
 
-print

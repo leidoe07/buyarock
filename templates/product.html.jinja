@@ -47,10 +47,10 @@
 
 <hr>
 
-<div class="alert alert-primary" role="alert">
+<div class="container">
 
   <h3>Reviews</h3>
-  <form action="/add_review/{{ product['product_id'] }}" method="post">
+  <form action="/add_review/{{ 'id' }}" method="post">
   <input type="number" id="rating" name="rating" class="form-control" min="1" max="5"   placeholder="Please input rating">
   <div class="form-floating">
   <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px" name="comment"></textarea>
@@ -63,17 +63,22 @@
 
 </div>
 <h3 class="card-title"> Other Reviews</h3>
-<hr
+<hr>
+<div class="row">
+    {% for review in reviews %}
+    <div class="col-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">{{ review['rating'] }}</h5>
+          <p class="card-text">{{ review['comment'] }}</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
 
 
 
-{% for review in reviews %}
-<p class="card-title"> Rating: {{ review['rating'] }} </p>
-<p class="card-text">{{ review['comment'] }}</p>
-<p class="card-text">By: {{ review['user_name'] }}</p>
-<p class="card-text">Date: {{ review['timestamp'] }}</p>
-</div>
-{% endfor %}
+  
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
