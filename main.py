@@ -104,12 +104,18 @@ def product_page(product_id):
                 JOIN  `Customer` ON `customer_id` = `Customer`.`id`
                 WHERE  `product_id` = {product_id} ;""")
     results = cursor.fetchall()
+    total = 0
+    for review in results:
+        rate = review['rating']
+        total= total + rate
+    count = len(results)
+    average = total/count
 
     cursor.close()
     conn.close()
     if result is  None:
         abort(404)
-    return render_template("product.html.jinja", product = result , reviews = results)
+    return render_template("product.html.jinja", product = result , reviews = results , average = average)
 
 
 @app.route("/product/<product_id>/cart" ,methods =['POST'])
@@ -361,14 +367,14 @@ def finish_sale():
     """)
     return ("/thankyou")
 
-@app.route("/add_review", methods=["POST"])
+@app.route("/add_review/<product_id>", methods=["POST"])
 def add_review(product_id):
     conn = connect_db()
     cursor = conn.cursor()
     comment = request.form["comment"]
     rating = request.form["rating"]
     customer_id = flask_login.current_user.user_id
-
+    cursor.execute(f"SELECT * FROM `Review` WHERE `product_id` = {product_id} AND `customer_id` = {customer_id};")
     
     cursor.execute(f"""
                     INSERT INTO `Review`
@@ -376,5 +382,10 @@ def add_review(product_id):
                     VALUES
                     ('{product_id}', '{comment}', '{rating}','{customer_id}')
                     """)
+    
+    conn.close()
+    cursor.close()
     flash("Review Added")
-    return redirect("/product/<product_id>")
+    return redirect("/product/<product_id>", product_id=product_id)
+
+print
