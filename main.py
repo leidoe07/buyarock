@@ -386,5 +386,4 @@ def add_review(product_id):
     conn.close()
     cursor.close()
     flash("Review Added")
-    return redirect("/product/<product_id>", product_id=product_id, result=result)
-
+    return redirect(url_for("product_page", product_id=product_id))
