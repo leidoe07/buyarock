@@ -1,34 +1,35 @@
-#buyarock {
+.buyarock {
     background-color: #fef6e4;
     color: #3d3d3d;
     font-family: 'Arial', sans-serif;
     padding: 20px;
   }
   
-  #buyarock h1 {
+  .buyarock h1 {
     color: #f28b82;
     font-size: 2.5rem;
     font-weight: bold;
     margin-bottom: 20px;
+    text-align: center;
   }
   
-  #buyarock p {
+  .buyarock p {
     color: #5f6368;
     font-size: 1rem;
     line-height: 1.6;
   }
   
-  #buyarock a {
+  .buyarock a {
     color: #93c5fd;
     text-decoration: none;
   }
   
-  #buyarock a:hover {
+  .buyarock a:hover {
     color: #60a5fa;
     text-decoration: underline;
   }
   
-  #buyarock button {
+  .buyarock button {
     background-color: #a5d6a7;
     color: #ffffff;
     border: none;
@@ -38,7 +39,7 @@
     cursor: pointer;
   }
   
-  #buyarock button:hover {
+  .buyarock button:hover {
     background-color: #81c784;
   }
   

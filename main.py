@@ -136,7 +136,7 @@ def add_to_cart(product_id):
                             `quantity`= `quantity` + {quantity}
                    
                   ;""" )
-        
+        #reveiw_username = 
         
         cursor.close()
         conn.close()
@@ -374,13 +374,14 @@ def add_review(product_id):
     comment = request.form["comment"]
     rating = request.form["rating"]
     customer_id = flask_login.current_user.user_id
-    cursor.execute(f"SELECT * FROM `Review` WHERE `product_id` = {product_id} AND `customer_id` = {customer_id};")
-    result = cursor.fetchone()
+
     cursor.execute(f"""
                     INSERT INTO `Review`
                     (`product_id`, `comment`, `rating`, `customer_id`)
                     VALUES
-                    ('{product_id}', '{comment}', '{rating}','{customer_id}')
+                    ({product_id}, '{comment}', '{rating}',{customer_id})
+                     ON DUPLICATE KEY UPDATE `comment`='{comment}',`rating`='{rating}'
+            
                     ;""")
     
     conn.close()
