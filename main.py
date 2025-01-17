@@ -105,18 +105,21 @@ def product_page(product_id):
                 WHERE  `product_id` = {product_id} ;""")
     results = cursor.fetchall()
     total = 0
+    average = 0
     for review in results:
         rate = review['rating']
         total= total + rate
-    count = len(results)
-    average = total/count
-
+        count = len(results)
+        if count > 0:
+            average = total/count
+        else:
+            flash("No reviews yet")
+    average = round(average, 2)
     cursor.close()
     conn.close()
     if result is  None:
         abort(404)
     return render_template("product.html.jinja", product = result , reviews = results , average = average)
-
 
 @app.route("/product/<product_id>/cart" ,methods =['POST'])
 @flask_login.login_required
@@ -387,4 +390,4 @@ def add_review(product_id):
     conn.close()
     cursor.close()
     flash("Review Added")
-    return redirect(url_for("product_page", product_id=product_id))
+    return redirect(url_for('/product/<product_id>',"product_page", product_id=product_id))
