@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request,redirect,flash,abort
+from flask import Flask, render_template, request,redirect,flash,abort,url_for
 import pymysql
 from dynaconf import Dynaconf
 import flask_login
@@ -390,4 +390,20 @@ def add_review(product_id):
     conn.close()
     cursor.close()
     flash("Review Added")
-    return redirect(url_for('/product/<product_id>',"product_page", product_id=product_id))
+    return redirect(url_for("product_page", product_id=product_id))
+
+@app.route("/past_orders")
+@flask_login.login_required
+def past_orders():
+    conn = connect_db()
+    cursor = conn.cursor()
+    customer_id = flask_login.current_user.user_id
+
+    cursor.execute(f"""
+                    SELECT * FROM `Sale` WHERE `customer_id` = {customer_id}
+                    ORDER BY `timestamp` DESC
+                    ;""")
+    results = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template("past_orders.html.jinja", sales=results)        
